@@ -1,1 +1,3 @@
-# bollinger-bands-library
+# Bollinger Band
+
+This solidity library is inspired by https://deno.land/x/bollinger_bands... 
