@@ -5,7 +5,6 @@ import "https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-contracts/ma
 import "https://raw.githubusercontent.com/smart-contract-modules-solidity/solidity-logger/main/src/logger.sol";
 
 library BollingerBands {
-
     // you might test it - e.g. with  [2, 20, 50]
 
     function getBollingerBands(int256[] memory sequence, uint256 spreadFactor)
@@ -18,20 +17,26 @@ library BollingerBands {
         )
     {
         require(spreadFactor > 0);
-        
+
         uint256 i = 0;
 
         int256[] memory smaBand = getSMABand(sequence);
         int256[] memory lowerBand = new int256[](sequence.length);
-        int[] memory upperBand = new int[](sequence.length);
+        int256[] memory upperBand = new int256[](sequence.length);
 
         for (i; i < smaBand.length; i++) {
             int256 standardDeviation = getStandardDeviation(
-                getArrayUntil(smaBand, i+1)
-             );
+                getArrayUntil(smaBand, i + 1)
+            );
 
-            lowerBand[i] = smaBand[i] - (standardDeviation * int(spreadFactor));
-            upperBand[i] = smaBand[i] + (standardDeviation * int(spreadFactor));
+            require(standardDeviation > 0);
+
+            lowerBand[i] =
+                smaBand[i] -
+                (standardDeviation * int256(spreadFactor));
+            upperBand[i] =
+                smaBand[i] +
+                (standardDeviation * int256(spreadFactor));
 
             // log("standardDeviation", standardDeviation);
         }
@@ -39,18 +44,14 @@ library BollingerBands {
         return (smaBand, lowerBand, upperBand);
     }
 
-    function getAverage(int256[] memory sequence)
-        public
-        pure
-        returns (int256)
-    {
+    function getAverage(int256[] memory sequence) public pure returns (int256) {
         int256 sum = 0;
         uint256 i = 0;
         for (i; i < sequence.length; i++) {
             sum = sum + sequence[i];
         }
 
-        return sum / int(sequence.length);
+        return sum / int256(sequence.length);
     }
 
     function getArrayUntil(int256[] memory array, uint256 offset)
@@ -110,7 +111,7 @@ library BollingerBands {
         int256 average
     ) public pure returns (int256[] memory) {
         int256[] memory squaredDifferences = new int256[](sequence.length);
-        
+
         uint256 i = 0;
 
         for (i; i < sequence.length; i++) {
@@ -141,5 +142,4 @@ library BollingerBands {
     {
         return (entry - average)**2;
     }
-
 }
